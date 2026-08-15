@@ -22,6 +22,9 @@ public class OrderBook {
     private final PriorityQueue<Order> sellQueue;
     private final Map<String, Order> orderMap;
 
+    /**
+     * Constructs a new OrderBook.
+     */
     public OrderBook() {
         this.buyQueue = new PriorityQueue<>(OrderComparator.getBuyComparator());
         this.sellQueue = new PriorityQueue<>(OrderComparator.getSellComparator());
@@ -100,14 +103,23 @@ public class OrderBook {
         return orderMap.containsKey(orderId);
     }
 
+    /**
+     * @return the best buy order, or null if none
+     */
     public Order peekBestBuy() {
         return buyQueue.peek();
     }
 
+    /**
+     * @return the best sell order, or null if none
+     */
     public Order peekBestSell() {
         return sellQueue.peek();
     }
 
+    /**
+     * @return removes and returns the best buy order
+     */
     public Order pollBestBuy() {
         Order bestBuy = buyQueue.poll();
         if (bestBuy != null) {
@@ -116,6 +128,9 @@ public class OrderBook {
         return bestBuy;
     }
 
+    /**
+     * @return removes and returns the best sell order
+     */
     public Order pollBestSell() {
         Order bestSell = sellQueue.poll();
         if (bestSell != null) {
@@ -126,6 +141,9 @@ public class OrderBook {
 
     /**
      * Returns a sorted list of current buy orders (without modifying the book).
+     */
+    /**
+     * @return an unmodifiable list of all resting buy orders
      */
     public List<Order> getBuyOrders() {
         List<Order> sortedList = new ArrayList<>();
@@ -140,6 +158,9 @@ public class OrderBook {
     /**
      * Returns a sorted list of current sell orders (without modifying the book).
      */
+    /**
+     * @return an unmodifiable list of all resting sell orders
+     */
     public List<Order> getSellOrders() {
         List<Order> sortedList = new ArrayList<>();
         PriorityQueue<Order> copy = new PriorityQueue<>(OrderComparator.getSellComparator());
@@ -150,26 +171,44 @@ public class OrderBook {
         return sortedList;
     }
 
+    /**
+     * Prints the buy side of the order book.
+     */
     public void printBuyOrders() {
         OrderPrinter.printBuyOrders(getBuyOrders());
     }
 
+    /**
+     * Prints the sell side of the order book.
+     */
     public void printSellOrders() {
         OrderPrinter.printSellOrders(getSellOrders());
     }
 
+    /**
+     * Prints the full order book.
+     */
     public void printOrderBook() {
         OrderPrinter.printOrderBook(getBuyOrders(), getSellOrders());
     }
 
+    /**
+     * @return the total number of orders in the book
+     */
     public int size() {
         return orderMap.size();
     }
 
+    /**
+     * @return true if the book is empty
+     */
     public boolean isEmpty() {
         return orderMap.isEmpty();
     }
 
+    /**
+     * Clears all orders from the book.
+     */
     public void clear() {
         buyQueue.clear();
         sellQueue.clear();

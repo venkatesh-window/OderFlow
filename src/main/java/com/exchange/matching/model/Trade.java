@@ -1,4 +1,5 @@
 package com.exchange.matching.model;
+// Triggering IDE refresh for Trade
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -8,12 +9,16 @@ import java.util.UUID;
  * Represents an executed trade resulting from a match between a buy order and a sell order.
  */
 public class Trade {
-    private final String tradeId;
-    private final String buyOrderId;
-    private final String sellOrderId;
-    private final long price;
-    private final long quantity;
-    private final LocalDateTime timestamp;
+    private String tradeId;
+    private String buyOrderId;
+    private String sellOrderId;
+    private long price;
+    private long quantity;
+    private LocalDateTime timestamp;
+
+    public Trade() {
+        // Default constructor for ObjectPool initialization
+    }
 
     public Trade(String buyOrderId, String sellOrderId, long price, long quantity) {
         this(UUID.randomUUID().toString(), buyOrderId, sellOrderId, price, quantity, LocalDateTime.now());
@@ -26,6 +31,18 @@ public class Trade {
         this.price = price;
         this.quantity = quantity;
         this.timestamp = timestamp != null ? timestamp : LocalDateTime.now();
+    }
+
+    /**
+     * Resets the trade object for reuse in a Zero-GC Object Pool.
+     */
+    public void reset(String tradeId, String buyOrderId, String sellOrderId, long price, long quantity) {
+        this.tradeId = tradeId;
+        this.buyOrderId = buyOrderId;
+        this.sellOrderId = sellOrderId;
+        this.price = price;
+        this.quantity = quantity;
+        this.timestamp = LocalDateTime.now(); // We can optimize this further if needed, but this allows reuse
     }
 
     public String getTradeId() {

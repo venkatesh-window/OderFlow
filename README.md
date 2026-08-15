@@ -269,3 +269,33 @@ To compile and verify all 13 test cases:
 mvn test
 ```
 All tests in `com.exchange.matching.engine.MatchingEngineTest` execute autonomously without requiring a Spring application context or external database.
+
+---
+
+## 7. How to Run the Application
+
+The OrderFlow application consists of a high-performance Java backend and a modern React/Vite frontend. You must start both for the application to function end-to-end.
+
+### 7.1 Start the Backend (Spring Boot)
+Open a terminal in the root directory (`c:\Users\gsven\OrderFlow`) and run:
+```bash
+# On Windows
+.\mvnw spring-boot:run
+
+# On Mac/Linux
+./mvnw spring-boot:run
+```
+This will compile the Java engine and start the REST API & WebSocket server on `http://localhost:8080`.
+
+### 7.2 Start the Frontend (React & Vite)
+Open a **new** terminal, navigate into the `frontend` folder, and start the development server:
+```bash
+cd frontend
+
+# Install dependencies (only required the first time)
+npm install
+
+# Start the frontend UI
+npm run dev
+```
+This will start the frontend interface. Look at your terminal output for the local URL (usually `http://localhost:5173`) and open it in your web browser to start trading!

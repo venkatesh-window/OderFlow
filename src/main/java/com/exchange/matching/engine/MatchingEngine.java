@@ -9,6 +9,8 @@ import com.exchange.matching.model.Order;
 import com.exchange.matching.model.Trade;
 import com.exchange.matching.orderbook.OrderBook;
 
+import com.exchange.matching.util.ObjectPool;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,21 +20,28 @@ import java.util.List;
  */
 public class MatchingEngine {
 
+    private final ObjectPool<Trade> tradePool;
+
+    /**
+     * Constructs a new MatchingEngine, initializing the object pool for trades.
+     */
+    public MatchingEngine() {
+        this.tradePool = new ObjectPool<>(Trade::new, 1024);
+    }
+
     /**
      * Attempts to match an incoming order against resting orders in the opposite order book.
      *
      * @param incomingOrder the newly submitted or modified order
      * @param orderBook     the current order book containing resting orders
      * @param tradeHistory  the trade history manager to record executed trades
-     * @return list of trades generated during this matching execution
+     * @param executedTrades the list to populate with trades generated during this matching execution
      * @throws MatchingException if an unexpected error occurs during matching
      */
-    public List<Trade> match(Order incomingOrder, OrderBook orderBook, TradeHistory tradeHistory) {
-        if (incomingOrder == null || orderBook == null || tradeHistory == null) {
-            throw new MatchingException("Matching parameters (order, book, history) cannot be null.");
+    public void match(Order incomingOrder, OrderBook orderBook, TradeHistory tradeHistory, List<Trade> executedTrades) {
+        if (incomingOrder == null || orderBook == null || tradeHistory == null || executedTrades == null) {
+            throw new MatchingException("Matching parameters cannot be null.");
         }
-
-        List<Trade> executedTrades = new ArrayList<>();
 
         try {
             while (incomingOrder.getRemainingQuantity() > 0) {
@@ -43,27 +52,20 @@ public class MatchingEngine {
                     oppositeOrder = orderBook.peekBestBuy();
                 }
 
-                // If no opposite orders exist in the book, matching stops
                 if (oppositeOrder == null) {
                     break;
                 }
 
-                // Check if prices cross (matching rules)
                 if (!canMatch(incomingOrder, oppositeOrder)) {
                     break;
                 }
 
-                // Determine trade execution price (Existing Order Price in the book has priority)
                 long tradePrice = determineTradePrice(incomingOrder, oppositeOrder);
-
-                // Trade quantity is minimum of both remaining quantities
                 long tradeQuantity = Math.min(incomingOrder.getRemainingQuantity(), oppositeOrder.getRemainingQuantity());
 
-                // Update remaining quantities
                 incomingOrder.setRemainingQuantity(incomingOrder.getRemainingQuantity() - tradeQuantity);
                 oppositeOrder.setRemainingQuantity(oppositeOrder.getRemainingQuantity() - tradeQuantity);
 
-                // Update status of resting opposite order
                 if (oppositeOrder.getRemainingQuantity() == 0) {
                     oppositeOrder.setStatus(OrderStatus.FILLED);
                     if (incomingOrder.getSide() == OrderSide.BUY) {
@@ -75,28 +77,27 @@ public class MatchingEngine {
                     oppositeOrder.setStatus(OrderStatus.PARTIALLY_FILLED);
                 }
 
-                // Update status of incoming order
                 if (incomingOrder.getRemainingQuantity() == 0) {
                     incomingOrder.setStatus(OrderStatus.FILLED);
                 } else {
                     incomingOrder.setStatus(OrderStatus.PARTIALLY_FILLED);
                 }
 
-                // Create Trade record
                 String buyOrderId = (incomingOrder.getSide() == OrderSide.BUY)
                         ? incomingOrder.getOrderId() : oppositeOrder.getOrderId();
                 String sellOrderId = (incomingOrder.getSide() == OrderSide.SELL)
                         ? incomingOrder.getOrderId() : oppositeOrder.getOrderId();
 
-                Trade trade = new Trade(buyOrderId, sellOrderId, tradePrice, tradeQuantity);
+                // Zero-GC: Borrow trade from pool instead of 'new'
+                Trade trade = tradePool.borrowObject();
+                trade.reset(java.util.UUID.randomUUID().toString(), buyOrderId, sellOrderId, tradePrice, tradeQuantity);
+                
                 tradeHistory.addTrade(trade);
                 executedTrades.add(trade);
             }
         } catch (Exception e) {
             throw new MatchingException("Error occurred during trade matching: " + e.getMessage(), e);
         }
-
-        return executedTrades;
     }
 
     /**

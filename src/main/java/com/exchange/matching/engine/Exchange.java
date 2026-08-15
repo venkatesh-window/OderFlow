@@ -50,7 +50,8 @@ public class Exchange {
             order.setStatus(OrderStatus.NEW);
         }
 
-        List<Trade> trades = matchingEngine.match(order, orderBook, tradeHistory);
+        List<Trade> trades = new java.util.ArrayList<>();
+        matchingEngine.match(order, orderBook, tradeHistory, trades);
 
         if (order.getRemainingQuantity() > 0) {
             orderBook.addOrder(order);
@@ -105,7 +106,8 @@ public class Exchange {
         order.setTimestamp(LocalDateTime.now());
         order.setStatus(OrderStatus.NEW);
 
-        List<Trade> trades = matchingEngine.match(order, orderBook, tradeHistory);
+        List<Trade> trades = new java.util.ArrayList<>();
+        matchingEngine.match(order, orderBook, tradeHistory, trades);
 
         if (order.getRemainingQuantity() > 0) {
             orderBook.addOrder(order);

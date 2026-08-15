@@ -18,6 +18,8 @@ public class OrderComparator {
      * BUY Queue Comparator:
      * 1. Highest price first (MARKET orders treated as Long.MAX_VALUE)
      * 2. If same price, earlier timestamp first (FIFO)
+     *
+     * @return a comparator for sorting buy orders
      */
     public static Comparator<Order> getBuyComparator() {
         return (o1, o2) -> {
@@ -36,6 +38,8 @@ public class OrderComparator {
      * SELL Queue Comparator:
      * 1. Lowest price first (MARKET orders treated as Long.MIN_VALUE)
      * 2. If same price, earlier timestamp first (FIFO)
+     *
+     * @return a comparator for sorting sell orders
      */
     public static Comparator<Order> getSellComparator() {
         return (o1, o2) -> {
