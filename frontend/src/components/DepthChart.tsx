@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import type { OrderBookSnapshot } from '../services/WebSocketClient';
 
 interface DepthChartProps {
@@ -6,7 +6,7 @@ interface DepthChartProps {
 }
 
 export function DepthChart({ snapshot }: DepthChartProps) {
-    const { bidPoints, askPoints, minPrice, maxPrice, maxDepth } = useMemo(() => {
+    const { bidPoints, askPoints, minPrice, maxPrice } = useMemo(() => {
         if (!snapshot) return { bidPoints: '', askPoints: '', minPrice: 0, maxPrice: 0, maxDepth: 0 };
 
         // Sort bids descending
@@ -32,7 +32,7 @@ export function DepthChart({ snapshot }: DepthChartProps) {
         });
 
         if (bidData.length === 0 && askData.length === 0) {
-            return { bidPoints: '', askPoints: '', minPrice: 0, maxPrice: 0, maxDepth: 0 };
+            return { bidPoints: '', askPoints: '', minPrice: 0, maxPrice: 0 };
         }
 
         const midPrice = (
@@ -93,8 +93,7 @@ export function DepthChart({ snapshot }: DepthChartProps) {
             bidPoints: bPts,
             askPoints: aPts,
             minPrice: minP,
-            maxPrice: maxP,
-            maxDepth: maxDepthVal
+            maxPrice: maxP
         };
     }, [snapshot]);
 

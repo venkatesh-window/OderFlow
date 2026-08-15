@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { wsClient } from './services/WebSocketClient';
 import type { Trade, OrderBookSnapshot } from './services/WebSocketClient';
 import './index.css';

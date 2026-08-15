@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useRef } from 'react';
+import { useMemo } from 'react';
 import type { OrderBookSnapshot } from '../services/WebSocketClient';
 import './OrderBook.css';
 
@@ -14,11 +14,8 @@ interface PriceLevel {
 }
 
 export function OrderBook({ snapshot }: OrderBookProps) {
-    const bidsRef = useRef<Record<string, number>>({});
-    const asksRef = useRef<Record<string, number>>({});
-
-    const { bids, asks, maxTotal } = useMemo(() => {
-        if (!snapshot) return { bids: [], asks: [], maxTotal: 1 };
+    const { bids, asks } = useMemo(() => {
+        if (!snapshot) return { bids: [], asks: [] };
 
         const processSide = (data: Record<string, number>, isAscending: boolean): PriceLevel[] => {
             const sortedPrices = Object.keys(data)
@@ -48,7 +45,7 @@ export function OrderBook({ snapshot }: OrderBookProps) {
         sortedBids.forEach(b => b.depthPercent = (b.total / overallMax) * 100);
         sortedAsks.forEach(a => a.depthPercent = (a.total / overallMax) * 100);
 
-        return { bids: sortedBids, asks: sortedAsks, maxTotal: overallMax };
+        return { bids: sortedBids, asks: sortedAsks };
     }, [snapshot]);
 
     return (

@@ -1,4 +1,3 @@
-import React from 'react';
 import type { Trade } from '../services/WebSocketClient';
 import './TradeTape.css';
 

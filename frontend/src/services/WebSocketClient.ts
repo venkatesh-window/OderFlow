@@ -22,7 +22,7 @@ class WebSocketClient {
         this.client = new Client({
             brokerURL: 'wss://oderflow-production.up.railway.app/ws-market-data',
             webSocketFactory: () => new SockJS('https://oderflow-production.up.railway.app/ws-market-data'),
-            debug: function (str) {
+            debug: function (_str) {
                 // console.log(str);
             },
             reconnectDelay: 5000,
