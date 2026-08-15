@@ -20,8 +20,8 @@ class WebSocketClient {
 
     constructor() {
         this.client = new Client({
-            brokerURL: 'ws://localhost:8080/ws-market-data',
-            webSocketFactory: () => new SockJS('http://localhost:8080/ws-market-data'),
+            brokerURL: 'wss://oderflow-production.up.railway.app/ws-market-data',
+            webSocketFactory: () => new SockJS('https://oderflow-production.up.railway.app/ws-market-data'),
             debug: function (str) {
                 // console.log(str);
             },

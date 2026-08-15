@@ -61,7 +61,7 @@ export function OrderEntryPanel({ snapshot }: OrderEntryPanelProps) {
         
         const orderId = `ORD-${Date.now()}`;
         const endpoint = orderType === 'LIMIT' ? 'limit' : 'market';
-        const url = new URL(`http://localhost:8080/api/v1/orders/${endpoint}`);
+        const url = new URL(`https://oderflow-production.up.railway.app/api/v1/orders/${endpoint}`);
         
         url.searchParams.append('orderId', orderId);
         url.searchParams.append('traderId', traderId);
